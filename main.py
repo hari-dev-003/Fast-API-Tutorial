@@ -1,10 +1,16 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI 
+from fastapi.middleware.cors import CORSMiddleware
 from models import Product
 import database_models
 from  database import session,engine
 from sqlalchemy.orm import Session
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"]
+)
 
 database_models.Base.metadata.create_all(bind=engine)
 
@@ -92,3 +98,11 @@ def delete_product(id:int,Lproduct:Product,db: Session = Depends(get_db)):
         return [product,"Is deleted Successfully"]
     else:
         return "Product Not found"
+    
+@app.post("/test")
+def testing_body_data(product:Product):
+    print(product)
+    return{
+        "message":"Product received Successfully",
+        "product": product.model_dump()
+    }
